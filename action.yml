@@ -1,0 +1,74 @@
+name: Setup Gopass
+description: 'Install and configure Gopass'
+inputs:
+  version:
+    description: 'The version of Gopass'
+    required: true
+    default: 'v1.15.15'
+  download-url:
+    description: 'The URL to download Gopass from'
+    required: true
+    default: 'https://github.com/gopasspw/gopass/releases/download'
+runs:
+  using: "composite"
+  steps:
+    - name: Check if Gopass is already installed on Linux
+      if: runner.os == 'Linux'
+      id: check-linux
+      shell: bash
+      run: |
+        # check-linux
+        if command -v gopass &> /dev/null; then
+          INSTALLED_VERSION="$(gopass --version | awk '{print $2}')"
+          if printf -- '%s' "v${INSTALLED_VERSION}" | egrep -q -- "${GOPASS_VERSION}"
+          then
+            echo "install-gopass=false" >> "$GITHUB_OUTPUT"
+            echo "::debug::Gopass is installed at version ${INSTALLED_VERSION}"
+          else
+            echo "install-gopass=true" >> "$GITHUB_OUTPUT"
+            echo "::debug::Gopass version does not match. Installed: ${INSTALLED_VERSION}, Required: ${GOPASS_VERSION}"
+          fi
+        else
+          echo "install-gopass=true" >> "$GITHUB_OUTPUT"
+          echo "::debug::Gopass is not installed"
+        fi
+      env:
+        GOPASS_VERSION: ${{ inputs.version }}
+
+    - name: Gather info for linux
+      if: runner.os == 'Linux' && steps.check-linux.outputs.install-gopass == 'true'
+      id: info-linux
+      shell: bash
+      run: |
+        # info-linux
+        VERSION="${GOPASS_VERSION/#v}"
+        PROC_TYPE="$(uname -p)"
+        if [[ "${PROC_TYPE}" == "x86_64" ]]; then
+          echo "asset-name=gopass-${VERSION}-linux-amd64" >> "$GITHUB_OUTPUT"
+        elif [[ "${PROC_TYPE}" == "aarch64" ]]; then
+          echo "asset-name=gopass-${VERSION}-linux-arm64" >> "$GITHUB_OUTPUT"
+        else
+          echo "error: unsupported architecture: ${PROC_TYPE}"
+          exit 1
+        fi
+
+        TARGET_DIR=$(mktemp -d -t gopass.XXXXXX)
+        echo "destination-folder=${TARGET_DIR}" >> "$GITHUB_OUTPUT"
+      env:
+        GOPASS_VERSION: ${{ inputs.version }}
+
+    - name: Setup on Linux
+      if: runner.os == 'Linux' && steps.check-linux.outputs.install-gopass == 'true'
+      id: setup-linux
+      shell: bash
+      run: |
+        # setup-linux
+        curl -LsJ "${DOWNLOAD_URL}/${VERSION}/${ASSET_NAME}.tar.gz" -o "${DESTINATION_FOLDER}/${ASSET_NAME}.tar.gz"
+        tar -xzf "${DESTINATION_FOLDER}/${ASSET_NAME}.tar.gz" -C "${DESTINATION_FOLDER}"
+        chmod +x "${DESTINATION_FOLDER}/gopass"
+        echo "${DESTINATION_FOLDER}" >> $GITHUB_PATH
+      env:
+        VERSION: ${{ inputs.version }}
+        DOWNLOAD_URL: ${{ inputs.download-url }}
+        ASSET_NAME: ${{ steps.info-linux.outputs.asset-name }}
+        DESTINATION_FOLDER: ${{ steps.info-linux.outputs.destination-folder }}
