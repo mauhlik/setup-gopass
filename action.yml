@@ -88,8 +88,8 @@ runs:
       id: install-gopass-provider
       shell: bash
       run: |
-        # Install Summon Gopass Provider
-        VERSION="${GOPASS_VERSION/#v}"
+        # Ensure architecture compatibility
+        VERSION="${GOPASS_PROVIDER_VERSION/#v}"
         PROC_TYPE="$(uname -m)"
         case "${PROC_TYPE}" in
           x86_64) SUMMON_ASSET="gopass-summon-provider-${VERSION}-linux-amd64" ;;
@@ -97,11 +97,19 @@ runs:
           *) echo "Unsupported architecture: ${PROC_TYPE}"; exit 1 ;;
         esac
 
-        curl -LsJ "${SUMMON_DOWNLOAD_URL}/${VERSION}/${SUMMON_ASSET}" -o "/usr/local/bin/summon-gopass"
-        chmod +x /usr/local/bin/summon-gopass
+        # Install summon-gopass provider in a temporary directory
+        INSTALL_DIR="$HOME/.local/bin"
+        mkdir -p "${INSTALL_DIR}"
+        curl -LsJ "${SUMMON_DOWNLOAD_URL}/${VERSION}/${SUMMON_ASSET}" -o "${INSTALL_DIR}/summon-gopass"
+        chmod +x "${INSTALL_DIR}/summon-gopass"
+
+        # Ensure summon-gopass is in the path
+        echo "${INSTALL_DIR}" >> "$GITHUB_PATH"
+
+        # Set environment variable for default provider
         echo "SUMMON_PROVIDER=summon-gopass" >> $GITHUB_ENV
       env:
-        GOPASS_VERSION: ${{ inputs.gopass-version }}
+        GOPASS_PROVIDER_VERSION: ${{ inputs.gopass-provider-version }}
         SUMMON_DOWNLOAD_URL: ${{ inputs.gopass-provider-download-url }}
 
     - name: Verify Installation
