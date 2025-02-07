@@ -30,6 +30,7 @@ runs:
       id: check-linux
       shell: bash
       run: |
+        # Check if Gopass is installed on Linux
         if command -v gopass &> /dev/null; then
           INSTALLED_VERSION="$(gopass --version | awk '{print $2}')"
           if [[ "v${INSTALLED_VERSION}" == "${GOPASS_VERSION}" ]]; then
@@ -51,6 +52,7 @@ runs:
       id: info-linux
       shell: bash
       run: |
+        # Gather install info for Linux
         VERSION="${GOPASS_VERSION/#v}"
         PROC_TYPE="$(uname -m)"
         case "${PROC_TYPE}" in
@@ -70,6 +72,7 @@ runs:
       id: install-gopass
       shell: bash
       run: |
+        # Install Gopass on Linux
         curl -LsJ "${DOWNLOAD_URL}/${VERSION}/${ASSET_NAME}.tar.gz" -o "${DESTINATION_FOLDER}/${ASSET_NAME}.tar.gz"
         tar -xzf "${DESTINATION_FOLDER}/${ASSET_NAME}.tar.gz" -C "${DESTINATION_FOLDER}"
         chmod +x "${DESTINATION_FOLDER}/gopass"
@@ -82,9 +85,10 @@ runs:
 
     - name: Install Summon Gopass Provider (optional)
       if: runner.os == 'Linux' && inputs.gopass-provider-install == 'true'
-      id: install-summon
+      id: install-gopass-provider
       shell: bash
       run: |
+        # Install Summon Gopass Provider
         VERSION="${GOPASS_VERSION/#v}"
         PROC_TYPE="$(uname -m)"
         case "${PROC_TYPE}" in
@@ -104,6 +108,7 @@ runs:
       if: runner.os == 'Linux'
       shell: bash
       run: |
+        # Verify Installation
         gopass --version
         if [[ "${INSTALL_GOPASS_PROVIDER}" == "true" ]]; then
           summon-gopass --version
