@@ -12,8 +12,8 @@ permissions:
   contents: read
 
 jobs:
-  test-action:
-    name: GitHub Actions Test
+  test-action-only-gopass:
+    name: GitHub Actions Test - only gopass
     runs-on: ubuntu-latest
 
     steps:
@@ -27,3 +27,23 @@ jobs:
 
       - name: Print gopass version
         run: gopass --version
+
+  test-action-gopass-with-provider:
+    name: GitHub Actions Test - gopass and provider
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        id: checkout
+        uses: actions/checkout@v4
+
+      - name: Test Local Action
+        id: test-action-01
+        uses: ./
+        with:
+          gopass-provider-install: true
+
+      - name: Print gopass version
+        run: gopass --version
+
+        
