@@ -81,7 +81,7 @@ runs:
         DESTINATION_FOLDER: ${{ steps.info-linux.outputs.destination-folder }}
 
     - name: Install Summon Gopass Provider (optional)
-      if: runner.os == 'Linux' && inputs.install-summon == 'true'
+      if: runner.os == 'Linux' && inputs.gopass-provider-install == 'true'
       id: install-summon
       shell: bash
       run: |
@@ -109,4 +109,4 @@ runs:
           summon-gopass --version
         fi
       env:
-        INSTALL_GOPASS_PROVIDER: ${{ inputs.install-summon }}
+        INSTALL_GOPASS_PROVIDER: ${{ inputs.gopass-provider-install }}
