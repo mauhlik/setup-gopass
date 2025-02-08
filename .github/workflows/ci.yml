@@ -46,4 +46,7 @@ jobs:
       - name: Print gopass version
         run: gopass --version
 
+      - name: Print summon gopass provider version
+        run: gopass-summon-provider --version
+
         
