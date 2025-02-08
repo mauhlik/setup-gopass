@@ -27,7 +27,7 @@ runs:
   steps:
     - name: Check if Gopass is installed on Linux
       if: runner.os == 'Linux'
-      id: check-linux
+      id: gopass-check-linux
       shell: bash
       run: |
         # Check if Gopass is installed on Linux
@@ -47,9 +47,9 @@ runs:
       env:
         GOPASS_VERSION: ${{ inputs.gopass-version }}
 
-    - name: Gather install info for Linux
-      if: runner.os == 'Linux' && steps.check-linux.outputs.install-gopass == 'true'
-      id: info-linux
+    - name: Gopass - Gather install info for Linux
+      if: runner.os == 'Linux' && steps.gopass-check-linux.outputs.install-gopass == 'true'
+      id: gopass-info-linux
       shell: bash
       run: |
         # Gather install info for Linux
@@ -67,9 +67,9 @@ runs:
       env:
         GOPASS_VERSION: ${{ inputs.gopass-version }}
 
-    - name: Install Gopass on Linux
+    - name: Gopass - Install on Linux
       if: runner.os == 'Linux' && steps.check-linux.outputs.install-gopass == 'true'
-      id: install-gopass
+      id: gopass-install-linux
       shell: bash
       run: |
         # Install Gopass on Linux
@@ -80,46 +80,41 @@ runs:
       env:
         VERSION: ${{ inputs.gopass-version }}
         DOWNLOAD_URL: ${{ inputs.gopass-download-url }}
-        ASSET_NAME: ${{ steps.info-linux.outputs.asset-name }}
-        DESTINATION_FOLDER: ${{ steps.info-linux.outputs.destination-folder }}
+        ASSET_NAME: ${{ steps.gopass-info-linux.outputs.asset-name }}
+        DESTINATION_FOLDER: ${{ steps.gopass-info-linux.outputs.destination-folder }}
 
-    - name: Install Summon Gopass Provider (optional)
+    - name: Summon Gopass Provider - Gather install info for Linux
       if: runner.os == 'Linux' && inputs.gopass-provider-install == 'true'
-      id: install-gopass-provider
+      id: gopass-provider-info-linux
       shell: bash
       run: |
-        # Ensure architecture compatibility
+        # Install Summon Gopass Provider
         VERSION="${GOPASS_PROVIDER_VERSION/#v}"
         PROC_TYPE="$(uname -m)"
         case "${PROC_TYPE}" in
-          x86_64) SUMMON_ASSET="gopass-summon-provider-${VERSION}-linux-amd64" ;;
-          aarch64) SUMMON_ASSET="gopass-summon-provider-${VERSION}-linux-arm64" ;;
+          x86_64) echo "asset-name=gopass-summon-provider-${VERSION}-linux-amd64" >> "$GITHUB_OUTPUT" ;;
+          aarch64) echo "asset-name=gopass-summon-provider-${VERSION}-linux-arm64" >> "$GITHUB_OUTPUT" ;;
           *) echo "Unsupported architecture: ${PROC_TYPE}"; exit 1 ;;
         esac
 
-        # Install summon-gopass provider in a temporary directory
-        INSTALL_DIR="$HOME/.local/bin"
-        mkdir -p "${INSTALL_DIR}"
-        curl -LsJ "${SUMMON_DOWNLOAD_URL}/${VERSION}/${SUMMON_ASSET}" -o "${INSTALL_DIR}/summon-gopass"
-        chmod +x "${INSTALL_DIR}/summon-gopass"
-
-        # Ensure summon-gopass is in the path
-        echo "${INSTALL_DIR}" >> "$GITHUB_PATH"
-
-        # Set environment variable for default provider
-        echo "SUMMON_PROVIDER=summon-gopass" >> $GITHUB_ENV
+        TARGET_DIR=$(mktemp -d -t summon-gopass.XXXXXX)
+        echo "destination-folder=${TARGET_DIR}" >> "$GITHUB_OUTPUT"
       env:
         GOPASS_PROVIDER_VERSION: ${{ inputs.gopass-provider-version }}
-        SUMMON_DOWNLOAD_URL: ${{ inputs.gopass-provider-download-url }}
 
-    - name: Verify Installation
-      if: runner.os == 'Linux'
+    - name: Summon Gopass Provider - Install on Linux
+      if: runner.os == 'Linux' && inputs.gopass-provider-install == 'true'
+      id: gopass-install-linux
       shell: bash
       run: |
-        # Verify Installation
-        gopass --version
-        if [[ "${INSTALL_GOPASS_PROVIDER}" == "true" ]]; then
-          summon-gopass --version
-        fi
+        # Install Summon Gopass Provider on Linux
+        curl -LsJ "${DOWNLOAD_URL}/${VERSION}/${ASSET_NAME}.tar.gz" -o "${DESTINATION_FOLDER}/${ASSET_NAME}.tar.gz"
+        tar -xzf "${DESTINATION_FOLDER}/${ASSET_NAME}.tar.gz" -C "${DESTINATION_FOLDER}"
+        chmod +x "${DESTINATION_FOLDER}/summon-gopass"
+        echo "${DESTINATION_FOLDER}" >> $GITHUB_PATH
+        echo "SUMMON_PROVIDER=summon-gopass" >> $GITHUB_ENV
       env:
-        INSTALL_GOPASS_PROVIDER: ${{ inputs.gopass-provider-install }}
+        VERSION: ${{ inputs.gopass-provider-version }}
+        DOWNLOAD_URL: ${{ inputs.gopass-provider-download-url }}
+        ASSET_NAME: ${{ steps.gopass-provider-install-linux.outputs.asset-name }}
+        DESTINATION_FOLDER: ${{ steps.gopass-provider-install-linux.outputs.destination-folder }}
