@@ -83,8 +83,24 @@ runs:
         ASSET_NAME: ${{ steps.gopass-info-linux.outputs.asset-name }}
         DESTINATION_FOLDER: ${{ steps.gopass-info-linux.outputs.destination-folder }}
 
-    - name: Summon Gopass Provider - Gather install info for Linux
+    - name: Check if Summon Gopass Provider is installed on Linux
       if: runner.os == 'Linux' && inputs.gopass-provider-install == 'true'
+      id: gopass-provider-check-linux
+      shell: bash
+      run: |
+        # Check if Summon Gopass Provider is installed on Linux
+        if command -v gopass-summon-provider &> /dev/null; then
+          echo "install-gopass-summon-provider=false" >> "$GITHUB_OUTPUT"
+          echo "::debug::Summon Gopass Provider is installed"
+        else
+          echo "install-gopass-summon-provider=true" >> "$GITHUB_OUTPUT"
+          echo "::debug::Summon Gopass Provider is not installed"
+        fi
+      env:
+        GOPASS_PROVIDER_VERSION: ${{ inputs.gopass-provider-version }}
+
+    - name: Summon Gopass Provider - Gather install info for Linux
+      if: runner.os == 'Linux' && steps.gopass-provider-check-linux.outputs.install-gopass-summon-provider == 'true'
       id: gopass-provider-info-linux
       shell: bash
       run: |
@@ -103,7 +119,7 @@ runs:
         GOPASS_PROVIDER_VERSION: ${{ inputs.gopass-provider-version }}
 
     - name: Summon Gopass Provider - Install on Linux
-      if: runner.os == 'Linux' && inputs.gopass-provider-install == 'true'
+      if: runner.os == 'Linux' && steps.gopass-provider-check-linux.outputs.install-gopass-summon-provider == 'true'
       id: gopass-provider-install-linux
       shell: bash
       run: |
