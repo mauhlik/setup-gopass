@@ -110,9 +110,9 @@ runs:
         # Install Summon Gopass Provider on Linux
         curl -LsJ "${DOWNLOAD_URL}/${VERSION}/${ASSET_NAME}.tar.gz" -o "${DESTINATION_FOLDER}/${ASSET_NAME}.tar.gz"
         tar -xzf "${DESTINATION_FOLDER}/${ASSET_NAME}.tar.gz" -C "${DESTINATION_FOLDER}"
-        chmod +x "${DESTINATION_FOLDER}/summon-gopass"
+        chmod +x "${DESTINATION_FOLDER}/gopass-summon-provider"
         echo "${DESTINATION_FOLDER}" >> $GITHUB_PATH
-        echo "SUMMON_PROVIDER=summon-gopass" >> $GITHUB_ENV
+        echo "SUMMON_PROVIDER=gopass-summon-provider" >> $GITHUB_ENV
       env:
         VERSION: ${{ inputs.gopass-provider-version }}
         DOWNLOAD_URL: ${{ inputs.gopass-provider-download-url }}
