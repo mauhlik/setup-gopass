@@ -68,7 +68,7 @@ runs:
         GOPASS_VERSION: ${{ inputs.gopass-version }}
 
     - name: Gopass - Install on Linux
-      if: runner.os == 'Linux' && steps.check-linux.outputs.install-gopass == 'true'
+      if: runner.os == 'Linux' && steps.gopass-check-linux.outputs.install-gopass == 'true'
       id: gopass-install-linux
       shell: bash
       run: |
@@ -116,5 +116,5 @@ runs:
       env:
         VERSION: ${{ inputs.gopass-provider-version }}
         DOWNLOAD_URL: ${{ inputs.gopass-provider-download-url }}
-        ASSET_NAME: ${{ steps.gopass-provider-install-linux.outputs.asset-name }}
-        DESTINATION_FOLDER: ${{ steps.gopass-provider-install-linux.outputs.destination-folder }}
+        ASSET_NAME: ${{ steps.gopass-provider-info-linux.outputs.asset-name }}
+        DESTINATION_FOLDER: ${{ steps.gopass-provider-info-linux.outputs.destination-folder }}
