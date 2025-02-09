@@ -12,7 +12,7 @@
         "datasourceTemplate": "github-releases",
         "depNameTemplate": "gopasspw/gopass",
         "currentValueTemplate": "{{currentValue}}",
-        "versioningTemplate": "semver",
+        "versioningTemplate": "semver"
       },
       {
         "customType": "regex",
