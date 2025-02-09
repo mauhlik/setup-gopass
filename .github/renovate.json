@@ -3,27 +3,25 @@
     "extends": ["config:recommended"],
     "commitMessagePrefix": "feat: ",
     "customManagers": [
-      {
-        "customType": "regex",
-        "fileMatch": ["^action\\.yml$"],
-        "matchStrings": [
-          "(?m)^\\s*gopass-version:\\s*['\"]?(?<currentValue>v?[0-9]+\\.[0-9]+\\.[0-9]+)['\"]?"
-        ],
-        "datasourceTemplate": "github-releases",
-        "depNameTemplate": "gopasspw/gopass",
-        "currentValueTemplate": "{{currentValue}}",
-        "versioningTemplate": "semver"
-      },
-      {
-        "customType": "regex",
-        "fileMatch": ["^action\\.yml$"],
-        "matchStrings": [
-          "(?m)^\\s*gopass-provider-version:\\s*['\"]?(?<currentValue>v?[0-9]+\\.[0-9]+\\.[0-9]+)['\"]?"
-        ],
-        "datasourceTemplate": "github-releases",
-        "depNameTemplate": "gopasspw/gopass-summon-provider",
-        "currentValueTemplate": "{{currentValue}}",
-        "versioningTemplate": "semver"
-      }
-    ]
+        {
+          "customType": "regex",
+          "fileMatch": ["^action\\.yml$"],
+          "matchStrings": [
+            "(?m)^\\s*gopass-version:\\s*\\n\\s*description:.*\\n\\s*required:.*\\n\\s*default:\\s*['\"]?(?<currentValue>v?[0-9]+\\.[0-9]+\\.[0-9]+)['\"]?"
+          ],
+          "datasourceTemplate": "github-releases",
+          "depNameTemplate": "gopasspw/gopass",
+          "currentValueTemplate": "{{currentValue}}"
+        },
+        {
+          "customType": "regex",
+          "fileMatch": ["^action\\.yml$"],
+          "matchStrings": [
+            "(?m)^\\s*gopass-provider-version:\\s*\\n\\s*description:.*\\n\\s*required:.*\\n\\s*default:\\s*['\"]?(?<currentValue>v?[0-9]+\\.[0-9]+\\.[0-9]+)['\"]?"
+          ],
+          "datasourceTemplate": "github-releases",
+          "depNameTemplate": "gopasspw/gopass-summon-provider",
+          "currentValueTemplate": "{{currentValue}}"
+        }
+      ]
   }
