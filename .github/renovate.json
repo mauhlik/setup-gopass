@@ -1,6 +1,7 @@
 {
     "$schema": "https://docs.renovatebot.com/renovate-schema.json",
     "extends": ["config:recommended"],
+    "commitMessagePrefix": "feat: ",
     "customManagers": [
       {
         "customType": "regex",
@@ -12,7 +13,6 @@
         "depNameTemplate": "gopasspw/gopass",
         "currentValueTemplate": "{{currentValue}}",
         "versioningTemplate": "semver",
-        "commitMessagePrefix": "feat: "
       },
       {
         "customType": "regex",
@@ -23,8 +23,7 @@
         "datasourceTemplate": "github-releases",
         "depNameTemplate": "gopasspw/gopass-summon-provider",
         "currentValueTemplate": "{{currentValue}}",
-        "versioningTemplate": "semver",
-        "commitMessagePrefix": "feat: "
+        "versioningTemplate": "semver"
       }
     ]
   }
