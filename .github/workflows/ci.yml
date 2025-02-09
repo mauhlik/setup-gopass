@@ -1,0 +1,64 @@
+name: Continuous Integration
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  test-action-only-gopass:
+    name: GitHub Actions Test - only gopass
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        id: checkout
+        uses: actions/checkout@v4
+
+      - name: Test Local Action
+        id: test-action-01
+        uses: ./
+
+      - name: Print gopass version
+        run: gopass --version
+
+      - name: Test Local Action
+        id: test-action-02
+        uses: ./
+
+  test-action-gopass-with-provider:
+    name: GitHub Actions Test - gopass and provider
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        id: checkout
+        uses: actions/checkout@v4
+
+      - name: Test Local Action
+        id: test-action-01
+        uses: ./
+        with:
+          gopass-provider-install: true
+
+      - name: Print gopass version
+        run: gopass --version
+
+      - name: Setup gopass store
+        run: |
+          gopass --yes setup --alias example --create --name "John Doe" --email "john.doe@example.com"
+
+      - name: Print summon gopass provider version
+        run: gopass-summon-provider --version
+
+      - name: Test Local Action
+        id: test-action-02
+        uses: ./
+        with:
+          gopass-provider-install: true

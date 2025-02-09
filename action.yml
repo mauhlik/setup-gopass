@@ -1,0 +1,136 @@
+name: Setup Gopass
+description: 'Install and configure Gopass and optionally Summon Gopass Provider'
+inputs:
+  gopass-version:
+    description: 'The version of Gopass'
+    required: true
+    default: 'v1.15.15'
+  gopass-download-url:
+    description: 'The URL to download Gopass from'
+    required: false
+    default: 'https://github.com/gopasspw/gopass/releases/download'
+  gopass-provider-install:
+    description: 'Whether to install Summon Gopass Provider'
+    required: false
+    default: 'false'
+  gopass-provider-version:
+    description: 'The version of Gopass provider'
+    required: false
+    default: 'v1.15.15'
+  gopass-provider-download-url:
+    description: 'The URL to download Summon Gopass Provider from'
+    required: false
+    default: 'https://github.com/gopasspw/gopass-summon-provider/releases/download'
+
+runs:
+  using: "composite"
+  steps:
+    - name: Check if Gopass is installed on Linux
+      if: runner.os == 'Linux'
+      id: gopass-check-linux
+      shell: bash
+      run: |
+        # Check if Gopass is installed on Linux
+        if command -v gopass &> /dev/null; then
+          INSTALLED_VERSION="$(gopass --version | awk '{print $2}')"
+          if [[ "v${INSTALLED_VERSION}" == "${GOPASS_VERSION}" ]]; then
+            echo "install-gopass=false" >> "$GITHUB_OUTPUT"
+            echo "::debug::Gopass is installed at version ${INSTALLED_VERSION}"
+          else
+            echo "install-gopass=true" >> "$GITHUB_OUTPUT"
+            echo "::debug::Installed: ${INSTALLED_VERSION}, Required: ${GOPASS_VERSION}"
+          fi
+        else
+          echo "install-gopass=true" >> "$GITHUB_OUTPUT"
+          echo "::debug::Gopass is not installed"
+        fi
+      env:
+        GOPASS_VERSION: ${{ inputs.gopass-version }}
+
+    - name: Gopass - Gather install info for Linux
+      if: runner.os == 'Linux' && steps.gopass-check-linux.outputs.install-gopass == 'true'
+      id: gopass-info-linux
+      shell: bash
+      run: |
+        # Gather install info for Linux
+        VERSION="${GOPASS_VERSION/#v}"
+        PROC_TYPE="$(uname -m)"
+        case "${PROC_TYPE}" in
+          x86_64) ASSET_NAME="gopass-${VERSION}-linux-amd64" ;;
+          aarch64) ASSET_NAME="gopass-${VERSION}-linux-arm64" ;;
+          *) echo "Unsupported architecture: ${PROC_TYPE}"; exit 1 ;;
+        esac
+
+        TARGET_DIR=$(mktemp -d -t gopass.XXXXXX)
+        echo "asset-name=${ASSET_NAME}" >> "$GITHUB_OUTPUT"
+        echo "destination-folder=${TARGET_DIR}" >> "$GITHUB_OUTPUT"
+      env:
+        GOPASS_VERSION: ${{ inputs.gopass-version }}
+
+    - name: Gopass - Install on Linux
+      if: runner.os == 'Linux' && steps.gopass-check-linux.outputs.install-gopass == 'true'
+      id: gopass-install-linux
+      shell: bash
+      run: |
+        # Install Gopass on Linux
+        curl -LsJ "${DOWNLOAD_URL}/${VERSION}/${ASSET_NAME}.tar.gz" -o "${DESTINATION_FOLDER}/${ASSET_NAME}.tar.gz"
+        tar -xzf "${DESTINATION_FOLDER}/${ASSET_NAME}.tar.gz" -C "${DESTINATION_FOLDER}"
+        chmod +x "${DESTINATION_FOLDER}/gopass"
+        echo "${DESTINATION_FOLDER}" >> $GITHUB_PATH
+      env:
+        VERSION: ${{ inputs.gopass-version }}
+        DOWNLOAD_URL: ${{ inputs.gopass-download-url }}
+        ASSET_NAME: ${{ steps.gopass-info-linux.outputs.asset-name }}
+        DESTINATION_FOLDER: ${{ steps.gopass-info-linux.outputs.destination-folder }}
+
+    - name: Check if Summon Gopass Provider is installed on Linux
+      if: runner.os == 'Linux' && inputs.gopass-provider-install == 'true'
+      id: gopass-provider-check-linux
+      shell: bash
+      run: |
+        # Check if Summon Gopass Provider is installed on Linux
+        if command -v gopass-summon-provider &> /dev/null; then
+          echo "install-gopass-summon-provider=false" >> "$GITHUB_OUTPUT"
+          echo "::debug::Summon Gopass Provider is installed"
+        else
+          echo "install-gopass-summon-provider=true" >> "$GITHUB_OUTPUT"
+          echo "::debug::Summon Gopass Provider is not installed"
+        fi
+      env:
+        GOPASS_PROVIDER_VERSION: ${{ inputs.gopass-provider-version }}
+
+    - name: Summon Gopass Provider - Gather install info for Linux
+      if: runner.os == 'Linux' && steps.gopass-provider-check-linux.outputs.install-gopass-summon-provider == 'true'
+      id: gopass-provider-info-linux
+      shell: bash
+      run: |
+        # Install Summon Gopass Provider
+        VERSION="${GOPASS_PROVIDER_VERSION/#v}"
+        PROC_TYPE="$(uname -m)"
+        case "${PROC_TYPE}" in
+          x86_64) echo "asset-name=gopass-summon-provider-${VERSION}-linux-amd64" >> "$GITHUB_OUTPUT" ;;
+          aarch64) echo "asset-name=gopass-summon-provider-${VERSION}-linux-arm64" >> "$GITHUB_OUTPUT" ;;
+          *) echo "Unsupported architecture: ${PROC_TYPE}"; exit 1 ;;
+        esac
+
+        TARGET_DIR=$(mktemp -d -t summon-gopass.XXXXXX)
+        echo "destination-folder=${TARGET_DIR}" >> "$GITHUB_OUTPUT"
+      env:
+        GOPASS_PROVIDER_VERSION: ${{ inputs.gopass-provider-version }}
+
+    - name: Summon Gopass Provider - Install on Linux
+      if: runner.os == 'Linux' && steps.gopass-provider-check-linux.outputs.install-gopass-summon-provider == 'true'
+      id: gopass-provider-install-linux
+      shell: bash
+      run: |
+        # Install Summon Gopass Provider on Linux
+        curl -LsJ "${DOWNLOAD_URL}/${VERSION}/${ASSET_NAME}.tar.gz" -o "${DESTINATION_FOLDER}/${ASSET_NAME}.tar.gz"
+        tar -xzf "${DESTINATION_FOLDER}/${ASSET_NAME}.tar.gz" -C "${DESTINATION_FOLDER}"
+        chmod +x "${DESTINATION_FOLDER}/gopass-summon-provider"
+        echo "${DESTINATION_FOLDER}" >> $GITHUB_PATH
+        echo "SUMMON_PROVIDER=gopass-summon-provider" >> $GITHUB_ENV
+      env:
+        VERSION: ${{ inputs.gopass-provider-version }}
+        DOWNLOAD_URL: ${{ inputs.gopass-provider-download-url }}
+        ASSET_NAME: ${{ steps.gopass-provider-info-linux.outputs.asset-name }}
+        DESTINATION_FOLDER: ${{ steps.gopass-provider-info-linux.outputs.destination-folder }}

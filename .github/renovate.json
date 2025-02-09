@@ -1,0 +1,30 @@
+{
+    "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+    "extends": ["config:recommended"],
+    "customManagers": [
+      {
+        "customType": "regex",
+        "fileMatch": ["^action\\.yml$"],
+        "matchStrings": [
+          "(?m)^\\s*gopass-version:\\s*['\"]?(?<currentValue>v?[0-9]+\\.[0-9]+\\.[0-9]+)['\"]?"
+        ],
+        "datasourceTemplate": "github-releases",
+        "depNameTemplate": "gopasspw/gopass",
+        "currentValueTemplate": "{{currentValue}}",
+        "versioningTemplate": "semver",
+        "commitMessagePrefix": "feat: "
+      },
+      {
+        "customType": "regex",
+        "fileMatch": ["^action\\.yml$"],
+        "matchStrings": [
+          "(?m)^\\s*gopass-provider-version:\\s*['\"]?(?<currentValue>v?[0-9]+\\.[0-9]+\\.[0-9]+)['\"]?"
+        ],
+        "datasourceTemplate": "github-releases",
+        "depNameTemplate": "gopasspw/gopass-summon-provider",
+        "currentValueTemplate": "{{currentValue}}",
+        "versioningTemplate": "semver",
+        "commitMessagePrefix": "feat: "
+      }
+    ]
+  }
