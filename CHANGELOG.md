@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.0](https://github.com/mauhlik/setup-gopass/compare/v1.0.1...v1.1.0) (2025-02-22)
+
+
+### Features
+
+* rename action params ([#10](https://github.com/mauhlik/setup-gopass/issues/10)) ([4e9ef31](https://github.com/mauhlik/setup-gopass/commit/4e9ef31459abe213fbb06cfa742cfdf6fea6c4d9))
+
 ## [1.0.1](https://github.com/mauhlik/setup-gopass/compare/v1.0.0...v1.0.1) (2025-02-09)
 
 
