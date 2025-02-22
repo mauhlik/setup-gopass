@@ -1,23 +1,23 @@
 name: Setup Gopass
 description: 'Install and configure Gopass and optionally Summon Gopass Provider'
 inputs:
-  gopass-version:
+  version:
     description: 'The version of Gopass'
     required: true
     default: 'v1.15.15'
-  gopass-download-url:
+  download-url:
     description: 'The URL to download Gopass from'
     required: false
     default: 'https://github.com/gopasspw/gopass/releases/download'
-  gopass-provider-install:
+  provider-install:
     description: 'Whether to install Summon Gopass Provider'
     required: false
     default: 'false'
-  gopass-provider-version:
+  provider-version:
     description: 'The version of Gopass provider'
     required: false
     default: 'v1.15.15'
-  gopass-provider-download-url:
+  provider-download-url:
     description: 'The URL to download Summon Gopass Provider from'
     required: false
     default: 'https://github.com/gopasspw/gopass-summon-provider/releases/download'
@@ -45,7 +45,7 @@ runs:
           echo "::debug::Gopass is not installed"
         fi
       env:
-        GOPASS_VERSION: ${{ inputs.gopass-version }}
+        GOPASS_VERSION: ${{ inputs.version }}
 
     - name: Gopass - Gather install info for Linux
       if: runner.os == 'Linux' && steps.gopass-check-linux.outputs.install-gopass == 'true'
@@ -65,7 +65,7 @@ runs:
         echo "asset-name=${ASSET_NAME}" >> "$GITHUB_OUTPUT"
         echo "destination-folder=${TARGET_DIR}" >> "$GITHUB_OUTPUT"
       env:
-        GOPASS_VERSION: ${{ inputs.gopass-version }}
+        GOPASS_VERSION: ${{ inputs.version }}
 
     - name: Gopass - Install on Linux
       if: runner.os == 'Linux' && steps.gopass-check-linux.outputs.install-gopass == 'true'
@@ -78,13 +78,13 @@ runs:
         chmod +x "${DESTINATION_FOLDER}/gopass"
         echo "${DESTINATION_FOLDER}" >> $GITHUB_PATH
       env:
-        VERSION: ${{ inputs.gopass-version }}
-        DOWNLOAD_URL: ${{ inputs.gopass-download-url }}
+        VERSION: ${{ inputs.version }}
+        DOWNLOAD_URL: ${{ inputs.download-url }}
         ASSET_NAME: ${{ steps.gopass-info-linux.outputs.asset-name }}
         DESTINATION_FOLDER: ${{ steps.gopass-info-linux.outputs.destination-folder }}
 
     - name: Check if Summon Gopass Provider is installed on Linux
-      if: runner.os == 'Linux' && inputs.gopass-provider-install == 'true'
+      if: runner.os == 'Linux' && inputs.provider-install == 'true'
       id: gopass-provider-check-linux
       shell: bash
       run: |
@@ -97,7 +97,7 @@ runs:
           echo "::debug::Summon Gopass Provider is not installed"
         fi
       env:
-        GOPASS_PROVIDER_VERSION: ${{ inputs.gopass-provider-version }}
+        GOPASS_PROVIDER_VERSION: ${{ inputs.provider-version }}
 
     - name: Summon Gopass Provider - Gather install info for Linux
       if: runner.os == 'Linux' && steps.gopass-provider-check-linux.outputs.install-gopass-summon-provider == 'true'
@@ -116,11 +116,11 @@ runs:
         TARGET_DIR=$(mktemp -d -t summon-gopass.XXXXXX)
         echo "destination-folder=${TARGET_DIR}" >> "$GITHUB_OUTPUT"
       env:
-        GOPASS_PROVIDER_VERSION: ${{ inputs.gopass-provider-version }}
+        GOPASS_PROVIDER_VERSION: ${{ inputs.provider-version }}
 
     - name: Summon Gopass Provider - Install on Linux
       if: runner.os == 'Linux' && steps.gopass-provider-check-linux.outputs.install-gopass-summon-provider == 'true'
-      id: gopass-provider-install-linux
+      id: provider-install-linux
       shell: bash
       run: |
         # Install Summon Gopass Provider on Linux
@@ -130,7 +130,7 @@ runs:
         echo "${DESTINATION_FOLDER}" >> $GITHUB_PATH
         echo "SUMMON_PROVIDER=gopass-summon-provider" >> $GITHUB_ENV
       env:
-        VERSION: ${{ inputs.gopass-provider-version }}
-        DOWNLOAD_URL: ${{ inputs.gopass-provider-download-url }}
+        VERSION: ${{ inputs.provider-version }}
+        DOWNLOAD_URL: ${{ inputs.provider-download-url }}
         ASSET_NAME: ${{ steps.gopass-provider-info-linux.outputs.asset-name }}
         DESTINATION_FOLDER: ${{ steps.gopass-provider-info-linux.outputs.destination-folder }}

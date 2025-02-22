@@ -45,7 +45,7 @@ jobs:
         id: test-action-01
         uses: ./
         with:
-          gopass-provider-install: true
+          provider-install: true
 
       - name: Print gopass version
         run: gopass --version
@@ -61,4 +61,4 @@ jobs:
         id: test-action-02
         uses: ./
         with:
-          gopass-provider-install: true
+          provider-install: true
