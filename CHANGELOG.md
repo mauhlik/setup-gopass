@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/mauhlik/setup-gopass/compare/v1.1.0...v1.2.0) (2025-04-28)
+
+
+### Features
+
+* set env.SUMMON_PROVIDER_PATH ([#12](https://github.com/mauhlik/setup-gopass/issues/12)) ([947a398](https://github.com/mauhlik/setup-gopass/commit/947a3985cc1a2452a32714fe792846559f51e135))
+
 ## [1.1.0](https://github.com/mauhlik/setup-gopass/compare/v1.0.1...v1.1.0) (2025-02-22)
 
 
