@@ -129,6 +129,7 @@ runs:
         chmod +x "${DESTINATION_FOLDER}/gopass-summon-provider"
         echo "${DESTINATION_FOLDER}" >> $GITHUB_PATH
         echo "SUMMON_PROVIDER=gopass-summon-provider" >> $GITHUB_ENV
+        echo "SUMMON_PROVIDER_PATH=${DESTINATION_FOLDER}" >> $GITHUB_ENV
       env:
         VERSION: ${{ inputs.provider-version }}
         DOWNLOAD_URL: ${{ inputs.provider-download-url }}
