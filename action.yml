@@ -4,7 +4,7 @@ inputs:
   version:
     description: 'The version of Gopass'
     required: true
-    default: 'v1.15.15'
+    default: 'v1.15.16'
   download-url:
     description: 'The URL to download Gopass from'
     required: false
@@ -16,7 +16,7 @@ inputs:
   provider-version:
     description: 'The version of Gopass provider'
     required: false
-    default: 'v1.15.15'
+    default: 'v1.15.16'
   provider-download-url:
     description: 'The URL to download Summon Gopass Provider from'
     required: false
