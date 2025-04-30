@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.1](https://github.com/mauhlik/setup-gopass/compare/v1.2.0...v1.2.1) (2025-04-30)
+
+
+### Bug Fixes
+
+* **deps:** update default version ([#14](https://github.com/mauhlik/setup-gopass/issues/14)) ([fd09ce6](https://github.com/mauhlik/setup-gopass/commit/fd09ce6254da903e621fd1884fbf657b87eeee78))
+
 ## [1.2.0](https://github.com/mauhlik/setup-gopass/compare/v1.1.0...v1.2.0) (2025-04-28)
 
 
