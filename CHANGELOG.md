@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0](https://github.com/mauhlik/setup-gopass/compare/v1.2.1...v1.3.0) (2025-11-24)
+
+
+### Features
+
+* Update actions/checkout action to v6 ([#17](https://github.com/mauhlik/setup-gopass/issues/17)) ([13d315a](https://github.com/mauhlik/setup-gopass/commit/13d315a04c5e182427845bf9d78d00c2eaee274d))
+
 ## [1.2.1](https://github.com/mauhlik/setup-gopass/compare/v1.2.0...v1.2.1) (2025-04-30)
 
 
